@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="assets/icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>ALTTP-AUTO-TRACKER</title>
+<link rel="stylesheet" href="css/tracker.css?v=60">
+
+<!-- PWA / mobile install support. See MOBILE-SETUP.txt for how to get
+     this onto a phone's home screen. -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#100e1c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ALTTP-AUTO-TRACKER">
+</head>
+<body class="shape-square" data-mobile-tab="items">
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <div class="sync" id="syncIndicator" title="Socket / Device / Sync">
+        <div class="node top" id="nodeSocket"></div>
+        <div class="bottom-row">
+          <div class="node" id="nodeDevice"></div>
+          <div class="node" id="nodeSync"></div>
+        </div>
+      </div>
+      <div>
+        <h1>ALTTP-AUTO-TRACKER</h1>
+        <div class="sub">connects directly to SNI / QUsb2Snes over your network</div>
+      </div>
+    </div>
+
+  <div class="conn-form">
+
+  <label for="host">Host</label>
+  <input id="host"
+         placeholder="192.168.1.42"
+         value="localhost">
+
+  <label for="port">Port</label>
+  <input id="port"
+         value="23074"
+         style="width:70px;">
+
+  <button id="connectBtn">Connect</button>
+  
+  
+
+</div>
+  </header>
+
+  <div class="seed-row-top">
+    <label for="seedCode">PermaLink Seed</label>
+    <input id="seedCode" placeholder="hash or alttpr.com link">
+    <button id="loadSeedBtn">Load</button>
+    <span id="seedInfo">Pulls medallion requirements from alttpr.com when available (not for race/tournament seeds).</span>
+
+    <span class="event-inline" id="eventNameRow" hidden>
+      <label for="eventName">Event</label>
+      <input id="eventName" type="text" maxlength="120" placeholder="Race or tournament name" autocomplete="off" title="Race Legal only — appears on report & certificate">
+    </span>
+
+    <button id="modeButton" class="btn practice">
+      <span class="mode-dot"></span>
+      <span class="mode-text">PRACTICE</span>
+    </button>
+    <label class="celebrate-toggle" id="celebrateToggleWrap" title="Show item confetti when a Practice run is finished">
+      <input type="checkbox" id="celebrateFinishToggle" checked>
+      <span>Finish confetti</span>
+    </label>
+  </div>
+
+  <div class="rando-mode-row" id="randoModeRow" aria-label="Randomizer mode settings">
+    <div class="field">
+      <label for="worldModeSelect">World</label>
+      <select id="worldModeSelect"></select>
+    </div>
+    <div class="field">
+      <label for="keysModeSelect">Keys</label>
+      <select id="keysModeSelect"></select>
+    </div>
+    <div class="field">
+      <label for="bossModeSelect">Bosses</label>
+      <select id="bossModeSelect"></select>
+    </div>
+    <div class="field">
+      <label for="entranceModeSelect">Entrances</label>
+      <select id="entranceModeSelect"></select>
+    </div>
+    <p class="rando-mode-hint">World / Bosses / Entrances change map logic. Entrance shuffle hides overworld &ldquo;available&rdquo; guesses (memory still clears checks). Record found doors in Entrance Notes. Keys shows the Dungeon Keys panel. All race-legal (no spoilers).</p>
+  </div>
+
+  <div class="timer-block" id="timerBlock" data-state="ready" style="margin-bottom:14px;">
+    <div class="timer-clock">
+      <div class="timer-heading">
+        <span>Run Timer</span>
+        <span class="timer-status" id="timerStatus">Ready</span>
+        <span class="rain-chip" id="rainChip" hidden data-state="clear" title="Standard prologue until Zelda is rescued">
+          <span class="rain-chip-dot" aria-hidden="true"></span>
+          <span id="rainChipText">Rain</span>
+        </span>
+      </div>
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+    </div>
+
+    <div class="timer-detail">
+      <div class="timer-message" id="timerMessage">Waiting for Link's first playable room.</div>
+      <div class="timer-last-pickup" id="timerLastPickup" hidden>
+        <span>Last pickup</span>
+        <strong id="timerLastPickupItem">—</strong>
+        <time id="timerLastPickupTime">—</time>
+      </div>
+    </div>
+
+    <div class="timer-controls">
+      <button id="timerStart" class="ghost">Start</button>
+      <button id="timerReset" class="ghost">Reset</button>
+      <button id="runHistoryButton" class="ghost run-history-button">Run History <span id="runHistoryButtonCount">0</span></button>
+      <button id="streamerUrlsButton" class="ghost streamer-launch-button">Streamer URLs</button>
+    </div>
+  </div>
+
+  <div class="main-columns">
+    <div class="col-items" id="colItems">
+
+<section class="items-section">
+      <div class="items-heading">
+        <h2>Items</h2>
+        <div class="item-heading-controls">
+          <button id="itemToneToggle" class="ghost item-view-toggle" type="button">Bright Icons</button>
+          <button id="itemViewToggle" class="ghost item-view-toggle" type="button">Compact View</button>
+        </div>
+      </div>
+      <div class="grid item-grid" id="gridAll" data-view="detailed"></div>
+    </section>
+
+<section class="keysanity-section" id="keysanityPanel" hidden>
+      <div class="keysanity-heading">
+        <h2>Dungeon Keys</h2>
+        <div class="keysanity-heading-meta">
+          <span class="keysanity-current" title="Keys on HUD in the current dungeon">
+            In-dungeon keys: <b id="keysanityCurrentKeys">—</b>
+          </span>
+        </div>
+      </div>
+      <p class="keysanity-note">From SRAM — small keys collected, big key / map / compass owned. Race-legal.</p>
+      <div class="keysanity-columns">
+        <div class="keysanity-grid" id="keysanityGrid"></div>
+        <div class="keysanity-divider" aria-hidden="true"></div>
+        <div class="keysanity-grid" id="keysanityGridRight"></div>
+      </div>
+    </section>
+
+<section class="entrance-pairing-section" id="entrancePairingPanel" hidden>
+      <div class="entrance-pairing-heading">
+        <h2>Entrance Notes</h2>
+        <div class="entrance-pairing-heading-meta">
+          <span id="entrancePairingCount">None recorded</span>
+          <button type="button" id="entrancePairClearAll" class="ghost" title="Clear all pairings">Clear</button>
+        </div>
+      </div>
+      <p class="entrance-pairing-note">Player-entered only — record holes you explored (e.g. this cave → EP). Race-legal. Used under Entrance shuffle to restore entry availability once the hole is reachable.</p>
+      <div class="entrance-pairing-list" id="entrancePairingList"></div>
+    </section>
+
+<section id="stuckPracticePanel" class="stuck-practice-panel">
+    <h2>Spoiler route</h2>
+    <p class="practice-race-note" id="practiceRaceNote" hidden>
+      Practice-only. Switch to <strong>PRACTICE</strong> for spoiler route help.
+    </p>
+<div class="stuck-panel" id="stuckPanel">
+      <button
+        id="stuckToggle"
+        class="stuck-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="stuckBody"
+      >
+        <span class="stuck-toggle-icon">🗺</span>
+        <span class="stuck-toggle-label">Spoiler route</span>
+        <span class="stuck-toggle-hint">Practice · next obtainable item</span>
+      </button>
+      <div class="stuck-body" id="stuckBody" hidden>
+        <div class="spoiler-route" id="spoilerRoute">
+          <p class="spoiler-intro">
+            Load a <strong>non-race</strong> seed above to import spoilers automatically.
+            <strong>Next item</strong> picks the highest-priority progression item you still need
+            at a check you can reach with your current items (public logic + spoiler placement).
+          </p>
+          <div class="spoiler-actions">
+            <button type="button" id="spoilerNextBtn" class="ghost stuck-suggest-btn" disabled>Next obtainable item</button>
+            <button type="button" id="spoilerClearBtn" class="ghost" disabled>Clear spoiler</button>
+          </div>
+          <p class="spoiler-status" id="spoilerStatus" data-state="empty">No spoiler loaded — use PermaLink Seed → Load.</p>
+          <p class="spoiler-load-info" id="spoilerLoadInfo"></p>
+          <div class="stuck-suggestion" id="spoilerSuggestion">
+            <p class="stuck-empty">Load a seed with spoilers, then press “Next obtainable item”.</p>
+          </div>
+          <details class="spoiler-advanced">
+            <summary>Paste spoiler manually</summary>
+            <textarea id="spoilerPaste" class="spoiler-paste" rows="3" placeholder="Only if seed has no spoilers — JSON or Location: Item lines"></textarea>
+            <button type="button" id="spoilerLoadBtn" class="ghost">Load pasted spoiler</button>
+          </details>
+        </div>
+      </div>
+    </div>
+
+      <div style="font-size:.6rem;color:var(--text-dim);margin-top:8px;">
+        Room <span id="liveRoom">—</span>
+ / Area <span id="liveArea">—</span>
+ / Mode <span id="liveGameMode">—</span>
+      </div>
+    </section>
+
+    </div>
+
+<div class="col-map" id="colMap">
+      <section class="map-section">
+        <div class="map-section-heading">
+          <h2>World Map — Available Checks &amp; Dungeon Routes</h2>
+          <div class="map-tools" id="mapToolsWrap">
+            <button
+              id="mapToolsToggle"
+              class="ghost map-tools-toggle"
+              type="button"
+              aria-expanded="false"
+              aria-controls="mapToolsPanel"
+            >⚙ Map Tools</button>
+            <div class="map-tools-panel" id="mapToolsPanel" hidden>
+              <button id="calibrateBtn" class="ghost">📍 Calibrate</button>
+              <button id="addMarkerBtn" class="ghost">➕ Add Marker</button>
+              <button id="renameBtn" class="ghost">✏️ Rename</button>
+              <button id="exportBtn" class="ghost">💾 Export Positions</button>
+            </div>
+          </div>
+        </div>
+        <div class="map-legend">
+          <span><span class="swatch locked"></span>Blocked</span>
+          <span><span class="swatch partial"></span>Partial Access</span>
+          <span><span class="swatch avail"></span>Full Clear</span>
+          <span><span class="player-legend-dot"></span><span id="playerLegendName">LINK</span></span>
+          <span>✓ Completed markers hide</span>
+        </div>
+        <div class="dungeon-prizes" aria-labelledby="dungeonPrizesTitle">
+          <div class="dungeon-prizes-heading">
+            <div class="dungeon-prizes-summary">
+              <span id="dungeonPrizesTitle">Dungeon Prizes</span>
+              <span class="dungeon-prizes-count" id="dungeonPrizeKnownCount">0/10 known</span>
+              <span class="dungeon-prizes-count" id="dungeonPrizeClaimedCount">0/10 claimed</span>
+              <span class="dungeon-prizes-count">Pendants <b id="pendantCount">0/3</b></span>
+              <span class="dungeon-prizes-count">Crystals <b id="crystalCount">0/7</b></span>
+            </div>
+            <div class="dungeon-prizes-actions">
+              <span>Click a diamond to choose</span>
+              <button id="clearDungeonPrizes" class="ghost dungeon-prizes-clear" type="button">Clear</button>
+            </div>
+          </div>
+          <div class="dungeon-prizes-body">
+            <div class="dungeon-prize-board">
+              <div class="dungeon-prize-grid" id="dungeonPrizeAssignments"></div>
+              <div class="dungeon-prize-legend" aria-hidden="true">
+                C Crystal <span>•</span> 5/6 Red Crystal <span>•</span> G/B/R Pendants
+              </div>
+            </div>
+            <div class="medallion-row prize-medallions" aria-label="Required dungeon medallions">
+              <div class="field">
+                <label for="mmMed">MM Needs</label>
+                <select id="mmMed">
+                  <option value="unknown">Unknown</option>
+                  <option value="bombos">Bombos</option>
+                  <option value="ether">Ether</option>
+                  <option value="quake">Quake</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="trMed">TR Needs</label>
+                <select id="trMed">
+                  <option value="unknown">Unknown</option>
+                  <option value="bombos">Bombos</option>
+                  <option value="ether">Ether</option>
+                  <option value="quake">Quake</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="world-tabs" id="worldTabs" role="tablist" aria-label="Map world">
+          <button type="button" class="world-tab" id="worldTabLight" data-world="light" role="tab" aria-selected="false">Light World</button>
+          <button type="button" class="world-tab" id="worldTabDark" data-world="dark" role="tab" aria-selected="false">Dark World</button>
+        </div>
+        <div class="map-panels" id="mapPanels">
+          <div class="map-panel light" id="panelLight"><div class="panel-label"></div></div>
+          <div class="map-panel dark" id="panelDark"><div class="panel-label"></div></div>
+        </div>
+        <div id="mapInfo">Red is inaccessible, yellow is partial, and green is fully completable. Standard chests, loose items, and NPC checks clear automatically; custom markers can be clicked to clear.</div>
+      </section>
+    </div>
+  </div>
+
+  <div id="colLog">
+  <section>
+    <h2>Connection Log</h2>
+    <div class="log" id="log"></div>
+  </section>
+  </div>
+
+</div>
+
+<nav class="mobile-tab-bar" id="mobileTabBar" aria-label="Tracker sections">
+  <button type="button" class="mobile-tab-btn" data-tab="items">
+    <span class="mobile-tab-icon">🎒</span>Items
+  </button>
+  <button type="button" class="mobile-tab-btn" data-tab="map">
+    <span class="mobile-tab-icon">🗺️</span>Map
+  </button>
+  <button type="button" class="mobile-tab-btn" data-tab="log">
+    <span class="mobile-tab-icon">📜</span>Log
+  </button>
+</nav>
+
+<div class="run-history-modal" id="runHistoryModal" hidden>
+  <section class="run-history-dialog" role="dialog" aria-modal="true" aria-labelledby="runHistoryTitle">
+    <header class="run-history-header">
+      <div>
+        <span class="run-history-kicker">Local Run Library</span>
+        <h2 id="runHistoryTitle">Run History</h2>
+      </div>
+      <div class="run-history-header-actions">
+        <span id="runHistoryCount">0 runs</span>
+        <button type="button" id="runHistoryClose" class="ghost" aria-label="Close Run History">×</button>
+      </div>
+    </header>
+    <p class="run-history-intro">Runs are saved automatically on this device. Select runs with the left markers — pick two to compare, or many to bulk-delete.</p>
+    <div class="run-history-list" id="runHistoryList"></div>
+    <footer class="run-history-footer">
+      <div class="run-history-compare-controls">
+        <button type="button" id="compareRuns" disabled>Compare Selected</button>
+        <button type="button" id="downloadRunComparison" class="ghost" disabled>Download Comparison</button>
+        <button type="button" id="deleteSelectedRuns" class="ghost run-history-delete-selected" disabled>Delete Selected</button>
+        <button type="button" id="selectAllRuns" class="ghost">Select All</button>
+        <button type="button" id="clearRunSelection" class="ghost">Clear</button>
+        <span id="runComparisonSelection">None selected</span>
+      </div>
+      <div class="run-history-library-controls">
+      <button type="button" id="exportRunLibrary" class="ghost">Export Run Library</button>
+      <button type="button" id="importRunLibrary" class="ghost">Import Run Library</button>
+      <input type="file" id="importRunLibraryFile" accept="application/json,.json" hidden>
+      </div>
+    </footer>
+  </section>
+</div>
+
+
+<div class="run-notes-modal" id="runNotesModal" hidden>
+  <section class="run-notes-dialog" role="dialog" aria-modal="true" aria-labelledby="runNotesTitle">
+    <header class="run-notes-header">
+      <h2 id="runNotesTitle">Notes</h2>
+      <button type="button" id="runNotesClose" class="ghost" aria-label="Close notes">×</button>
+    </header>
+    <p class="run-notes-intro">Notes for this run — stored on this device with Run History and included on the run report.</p>
+    <p class="run-notes-meta" id="runNotesMeta">No note yet</p>
+    <textarea id="runNotesText" class="run-notes-text" rows="6" maxlength="2000" placeholder="e.g. died at Mothula, skipped PoD big key, practice seed…"></textarea>
+    <footer class="run-notes-footer">
+      <button type="button" id="runNotesClear" class="ghost run-notes-clear" disabled>Clear</button>
+      <span class="run-notes-footer-spacer"></span>
+      <button type="button" id="runNotesCancel" class="ghost">Cancel</button>
+      <button type="button" id="runNotesSave">Save Note</button>
+    </footer>
+  </section>
+</div>
+
+<div class="streamer-modal" id="streamerModal" hidden>
+  <section class="streamer-dialog" role="dialog" aria-modal="true" aria-labelledby="streamerTitle">
+    <header class="streamer-header">
+      <div>
+        <span class="streamer-kicker">OBS Browser Sources</span>
+        <h2 id="streamerTitle">Streamer URLs</h2>
+      </div>
+      <button type="button" id="streamerClose" aria-label="Close Streamer URLs">×</button>
+    </header>
+    <div class="streamer-body">
+      <p class="streamer-intro">
+        This builds a URL to <strong>streamer.html</strong> — a dedicated
+        overlay layout (timer on top, items left, map right, transparent
+        center for your game capture). Use <strong>one</strong> OBS Browser
+        Source. SNI only allows a single device attach, so disconnect the
+        main tracker first or the overlay will sit idle.
+      </p>
+      <p class="streamer-intro streamer-warning">
+        Host should be reachable <em>from the OBS machine</em>
+        (<code>localhost</code> if SNI runs on the same PC).
+        Serve the folder with <code>start-tracker-windows.bat</code> (or
+        <code>python -m http.server 8000</code>) — do not use a
+        <code>file://</code> path in OBS.
+      </p>
+      <p class="streamer-intro streamer-experimental">
+        <strong>Experimental.</strong> Stream overlay layouts and slot
+        presets are still evolving. Expect occasional layout quirks;
+        report issues and prefer <strong>Classic</strong> or
+        <strong>Race</strong> for production streams.
+      </p>
+
+      <div>
+        <div class="streamer-url-label">Quick presets</div>
+        <div class="streamer-presets" id="streamerPresets"></div>
+      </div>
+
+      <div>
+        <div class="streamer-url-label">Panels to include</div>
+        <div class="streamer-panels">
+          <label><input type="checkbox" id="streamerPanel-items">Items</label>
+          <label><input type="checkbox" id="streamerPanel-map">Map</label>
+          <label><input type="checkbox" id="streamerPanel-timer">Run Timer</label>
+          <label><input type="checkbox" id="streamerPanel-spoiler">Spoiler route</label>
+          <label><input type="checkbox" id="streamerPanel-log">Log</label>
+        </div>
+      </div>
+
+      <div>
+        <div class="streamer-url-label">Layout preset</div>
+        <select id="streamerLayoutPreset" class="streamer-layout-select"></select>
+      </div>
+
+      <div>
+        <div class="streamer-url-label">Slot assignment (optional overrides)</div>
+        <div class="streamer-slots">
+          <label>Top<select id="streamerSlot-top"></select></label>
+          <label>Left<select id="streamerSlot-left"></select></label>
+          <label>Center<select id="streamerSlot-center"></select></label>
+          <label>Right<select id="streamerSlot-right"></select></label>
+          <label>Bottom<select id="streamerSlot-bottom"></select></label>
+        </div>
+        <p class="streamer-slot-help">Presets fill the slots for you. Pick <strong>Custom slots</strong> (or change any dropdown) to place modules manually. The center slot is usually left empty for your game capture.</p>
+      </div>
+
+      <div class="streamer-hostport">
+        <div class="field">
+          <label for="streamerHost">Host</label>
+          <input id="streamerHost" placeholder="192.168.1.42">
+        </div>
+        <div class="field">
+          <label for="streamerPort">Port</label>
+          <input id="streamerPort" placeholder="23074">
+        </div>
+        <div class="field">
+          <label for="streamerAutoconnect">&nbsp;</label>
+          <label style="display:flex;align-items:center;gap:6px;height:30px;">
+            <input type="checkbox" id="streamerAutoconnect" checked>Auto-connect
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <div class="streamer-url-label">URL for OBS</div>
+        <div class="streamer-url-row">
+          <input id="streamerUrlOutput" readonly placeholder="Pick at least one panel above">
+          <button type="button" id="streamerCopyBtn">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Load order matters: later files call functions/reference data
+     defined in earlier ones (plain globals, no bundler/modules). -->
+<script src="js/constants.js?v=58"></script>
+<script src="js/state.js?v=46"></script>
+<script src="js/memory.js?v=48"></script>
+<script src="js/dungeonData.js?v=2"></script>
+<script src="js/requirements.js?v=10"></script>
+<script src="js/entrance.js?v=4"></script>
+<script src="js/logic.js?v=42"></script>
+<script src="js/navigator.js"></script>
+<script src="js/areas.js"></script>
+<script src="js/settings.js?v=11"></script>
+<script src="js/sni.js"></script>
+<script src="js/playerSprite.js?v=53"></script>
+<script src="js/ui.js?v=58"></script>
+<script src="js/dungeon.js?v=2"></script>
+<script src="js/map.js?v=61"></script>
+<script src="js/timer.js?v=50"></script>
+<script src="js/runData.js?v=48"></script>
+<script src="js/report.js?v=56"></script>
+<script src="js/comparison.js?v=53"></script>
+<script src="js/runHistory.js?v=58"></script>
+<script src="js/export.js?v=55"></script>
+<script src="js/seed.js"></script>
+<script src="js/spoiler.js?v=3"></script>
+<script src="js/celebrate.js?v=2"></script>
+<script src="js/tracker.js?v=54"></script>
+<script src="js/streamer.js?v=12"></script>
+<script src="js/mobileTabs.js?v=1"></script>
+<script src="js/controllerMode.js?v=12"></script>
+<script src="js/controlSync.js?v=2"></script>
+<script src="js/main.js?v=48"></script>
+<script src="js/pwa.js?v=1"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Local server sync state (never commit — per-machine runtime data)
+.entrance-pairings-sync.json
+.rando-modes-sync.json
+.run-control-sync.json
+.prizes-sync.json
+.run-history-sync.json
+.coaching-sync.json
+.*.sync.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+# Packaging / local zips
+*.zip
+dist/
+build/

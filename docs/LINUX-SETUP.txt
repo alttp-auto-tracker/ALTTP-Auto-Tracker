@@ -1,0 +1,286 @@
+ALTTP-AUTO-TRACKER — Linux setup (OBS + SNI + emulator)
+=======================================================
+Last updated: 2026-08-06
+
+This guide is for running the tracker on Linux with:
+  - OBS Studio          (stream overlay / Browser Source)
+  - SNI                 (memory bridge — recommended)
+  - Snes9x / RetroArch  (emulator; “SNEx” usually means Snes9x)
+
+Hardware FX Pak Pro / SD2SNES is optional; most practice setups use an emulator.
+
+
+================================================================================
+1. BIG PICTURE
+================================================================================
+
+  Emulator (Snes9x / RetroArch / hardware)
+           │
+           ▼
+     SNI  (or QUsb2Snes)   ← listens on ws://localhost:23074
+           │
+           ▼
+  tracker-server.py  +  browser (tracker.html / streamer.html)
+           │
+           ▼
+  OBS Browser Source → streamer.html
+
+
+Only ONE browser tab should Connect to SNI at a time.
+Recommended: OBS (streamer.html) = SNI host; phone = controller mode.
+
+
+================================================================================
+2. INSTALL OBS STUDIO
+================================================================================
+
+Ubuntu / Debian / Mint:
+  sudo apt update
+  sudo apt install obs-studio
+
+Fedora:
+  sudo dnf install obs-studio
+
+Flatpak (any distro):
+  flatpak install flathub com.obsproject.Studio
+  flatpak run com.obsproject.Studio
+
+Arch:
+  sudo pacman -S obs-studio
+
+Tips:
+  - Use a recent OBS (28+) so the Browser Source CEF is less painful.
+  - For streaming ALTTP, add:
+      1) Game capture / Window capture of the emulator
+      2) Browser Source pointing at streamer.html (see section 6)
+
+
+================================================================================
+3. INSTALL SNI (recommended bridge)
+================================================================================
+
+SNI = Super Nintendo Interface (alttpo/sni).
+It talks to hardware and emulators and exposes a usb2snes-compatible
+WebSocket on port 23074 — the same port this tracker expects.
+
+Download / build
+----------------
+Project: https://github.com/alttpo/sni
+
+  # Option A — release binary (if published for your arch)
+  # Download from GitHub Releases, extract, run ./sni
+
+  # Option B — build from source (Go required)
+  sudo apt-get install -y gcc libgtk-3-dev libayatana-appindicator3-dev  # Debian/Ubuntu
+  go install   # need Go 1.20+
+  git clone https://github.com/alttpo/sni.git
+  cd sni
+  go build -o sni ./cmd/sni
+  ./sni
+
+Leave SNI running in a terminal (or a user systemd service).
+
+Default ports
+-------------
+  usb2snes WebSocket:  0.0.0.0:23074   ← tracker uses this
+  gRPC:                8191
+  gRPC-Web:            8190
+
+FX Pak Pro / SD2SNES on Linux
+-----------------------------
+Install the udev rule so non-root users can open the device:
+
+  sudo cp linux/udev/rules.d/51-fxpak.rules /etc/udev/rules.d/
+  sudo udevadm control --reload
+  sudo udevadm trigger
+
+(Path is inside the SNI repo under linux/udev/rules.d/)
+
+
+Alternative: QUsb2Snes
+----------------------
+If you prefer QUsb2Snes instead of SNI:
+
+  Debian/Ubuntu/Mint:  https://debian.nyo.fr  (follow their repo instructions)
+  Arch:                AUR package qusb2snes-git
+  Other:               build from https://github.com/Skarsnik/QUsb2snes
+
+QUsb2Snes also speaks usb2snes on the usual ports. Do NOT run SNI and
+QUsb2Snes at the same time on the same port.
+
+
+================================================================================
+4. EMULATOR — Snes9x / “SNEx” / RetroArch
+================================================================================
+
+“SNEx” in casual talk almost always means **Snes9x** (or a Snes9x-based
+build). What matters for the tracker is that **SNI (or QUsb2Snes) can see
+the emulator’s memory**.
+
+--------------------------------------------------------------------------------
+4a. RetroArch + bsnes-mercury or Snes9x core  (works well with SNI)
+--------------------------------------------------------------------------------
+
+Install RetroArch:
+  sudo apt install retroarch          # Debian/Ubuntu
+  # or Flatpak: flatpak install flathub org.libretro.RetroArch
+
+Enable network commands (required):
+
+  Edit ~/.config/retroarch/retroarch.cfg  (path may vary):
+
+    network_cmd_enable = "true"
+
+  Or in RetroArch UI:
+    Settings → Network → Network Commands → ON
+
+Load a core:
+  - bsnes-mercury (accuracy/balanced)  — preferred for randomizer accuracy
+  - Snes9x core                        — also fine for most seeds
+
+Start the game, leave RetroArch running, then start SNI. SNI should list
+a RetroArch device when network commands are on.
+
+--------------------------------------------------------------------------------
+4b. Standalone Snes9x
+--------------------------------------------------------------------------------
+
+Install examples:
+  Flatpak:  flatpak install flathub com.snes9x.Snes9x
+  Ubuntu:   check distro packages or build from https://github.com/snes9xgit/snes9x
+
+Memory access depends on bridge support:
+  - Older “Snes9x-rr + Lua bridge” setups are largely legacy.
+  - Prefer RetroArch + SNI, or an NWA-capable Snes9x build if you have one
+    (Snes9x-nwa / Emulator Network Access) with QUsb2Snes or SNI as documented
+    by the usb2snes community.
+
+If SNI does not see standalone Snes9x, use RetroArch (4a) instead.
+
+--------------------------------------------------------------------------------
+4c. Hardware (FX Pak Pro / SD2SNES)
+--------------------------------------------------------------------------------
+
+  1. USB cable to the PC
+  2. udev rule installed (section 3)
+  3. Start SNI — device should appear
+  4. Load the randomized ROM on the cart / via QFile2Snes as you normally do
+
+
+================================================================================
+5. ALTTP-AUTO-TRACKER
+================================================================================
+
+Requirements: Python 3.8+ (stdlib only — no pip packages required)
+
+  cd /path/to/alttpr-tracker
+  python3 tracker-server.py
+
+Open:
+  Main UI:     http://localhost:8000/tracker.html
+  Stream:      http://localhost:8000/streamer.html
+  Phone:       http://<your-lan-ip>:8000/tracker.html?controller=1
+
+Firewall: allow TCP 8000 on your LAN if the phone cannot connect.
+
+Connect dialog (host / port):
+  Host:  localhost     (or the PC’s LAN IP from another machine)
+  Port:  23074         (SNI usb2snes default)
+
+Only Connect from ONE client (prefer OBS streamer.html).
+
+
+================================================================================
+6. OBS BROWSER SOURCE
+================================================================================
+
+  1. Start SNI, emulator (game running), tracker-server.py
+  2. OBS → Sources → Add → Browser
+  3. URL example:
+
+       http://localhost:8000/streamer.html?layout=race
+
+     Or use “Streamer URLs” on tracker.html to copy a full URL.
+
+  4. Width / height: match your overlay design (e.g. 1920×1080 or a side bar)
+  5. Check “Shutdown source when not visible” OFF if you want it always live
+  6. Optional: “Refresh browser when scene becomes active”
+
+  7. In the overlay, confirm version badge (e.g. v1.0.0)
+  8. Connect to SNI only in that Browser Source (or only in tracker.html —
+     not both)
+
+Transparency:
+  streamer.html is designed for a transparent page over game capture.
+  In OBS, the Browser Source should allow transparency (default).
+
+
+================================================================================
+7. RECOMMENDED START ORDER
+================================================================================
+
+  1. SNI
+  2. Emulator / hardware — load ROM, get in-game
+  3. python3 tracker-server.py
+  4. OBS Browser Source → streamer.html → Connect
+  5. Phone controller (optional) — do NOT Connect
+
+
+================================================================================
+8. QUICK CHECKS / TROUBLESHOOTING
+================================================================================
+
+Tracker says “No devices”
+  - Is SNI running?
+  - Is the emulator running with a game loaded?
+  - RetroArch: network_cmd_enable = true ?
+  - Port 23074 free?  (ss -tlnp | grep 23074)
+  - Only one usb2snes server (don’t run SNI + QUsb2Snes together)
+
+“Another client may already be attached”
+  - Close Connect on tracker.html if OBS is the host
+  - Refresh the OBS browser source
+  - Restart SNI as a last resort
+
+Phone cannot open the page
+  - Use the PC’s LAN IP, not localhost
+  - tracker-server.py binds 0.0.0.0 — check firewall for port 8000
+
+OBS overlay blank / old layout
+  - Hard refresh Browser Source or toggle the source
+  - Confirm URL has current streamer.html and LAYOUT tag
+
+Map / items lag on OBS
+  - Prefer SNI host = OBS only
+  - See HANDOFF.txt for stream poll notes
+
+FX Pak not listed on Linux
+  - udev rules installed and udevadm reloaded
+  - User in the correct group if the rule uses one
+  - Cable / firmware usb2snes-compatible
+
+
+================================================================================
+9. USEFUL LINKS
+================================================================================
+
+  SNI:              https://github.com/alttpo/sni
+  QUsb2Snes:        https://github.com/Skarsnik/QUsb2snes
+  usb2snes overview:http://usb2snes.com/
+  OBS Studio:       https://obsproject.com/
+  RetroArch:        https://www.retroarch.com/
+  This tracker:     HANDOFF.txt  ·  STREAM-LAYOUT.txt  ·  MOBILE-SETUP.txt
+
+
+================================================================================
+10. MINIMAL CHEAT SHEET
+================================================================================
+
+  sudo apt install obs-studio retroarch   # example distro packages
+  # enable RetroArch network_cmd_enable = true
+  ./sni &                                 # leave running
+  python3 tracker-server.py               # from alttpr-tracker folder
+  # OBS Browser Source → http://localhost:8000/streamer.html?layout=race
+  # Connect once in OBS; phone uses ?controller=1 without Connect
+
+End of Linux setup guide.

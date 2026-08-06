@@ -1,0 +1,127 @@
+ALTTP-AUTO-TRACKER — Stream overlay layouts
+==========================================
+
+Use these options with streamer.html in an OBS Browser Source.
+Serve the tracker with tracker-server.py (recommended) so sync and
+cache-busting work:
+
+  python3 tracker-server.py
+
+Then open the main tracker and use  Streamer URLs  to build a link,
+or type a URL by hand as below.
+
+
+1) Layout presets (easiest)
+---------------------------
+Add  layout=<name>  to the streamer URL.
+
+  classic      Timer on top; I'm Stuck left; Maps right; Items bottom
+               (center is empty for your game capture)
+
+  race         Timer on top; Maps right; Items bottom (no I'm Stuck)
+
+  focus_items  Timer on top; Items left (vertical grid); Maps right
+
+  maps_left    Timer on top; Maps left; I'm Stuck right; Items bottom
+
+  timer_only   Only the run timer
+
+  items_only   Only the item grid (anchored to the bottom strip)
+
+  maps_only    Only the light/dark maps (+ prizes)
+
+  Note: layout presets are experimental. Prefer classic or race for
+  production streams. (Vertical stack was removed — it left no room
+  for game capture.)
+
+Examples:
+
+  http://localhost:8000/streamer.html?layout=classic
+  http://localhost:8000/streamer.html?layout=race
+  http://localhost:8000/streamer.html?layout=timer_only
+
+
+2) Slot assignment (manual placement)
+-------------------------------------
+The overlay is a 3-row board:
+
+  [        TOP spanning full width        ]
+  [  LEFT  |  CENTER (game hole) | RIGHT ]
+  [       BOTTOM spanning full width      ]
+
+Assign any module to a slot with URL parameters:
+
+  top     left     center     right     bottom
+
+Modules you can place:
+
+  timer   Run timer bar
+  stuck   I'm Stuck (Practice only)
+  maps    Light + Dark world maps (and prizes)
+  items   Item grid
+  game    Empty transparent hole (for game capture underneath)
+  log     Tracker log text
+  none    Leave the slot empty
+
+Examples:
+
+  # Classic by hand
+  http://localhost:8000/streamer.html?top=timer&left=best&center=game&right=maps&bottom=items
+
+  # Timer on top, items on the right only
+  http://localhost:8000/streamer.html?top=timer&left=none&center=game&right=items&bottom=none
+
+  # Maps on the left, items on the bottom
+  http://localhost:8000/streamer.html?top=timer&left=maps&center=game&right=none&bottom=items
+
+You can combine a preset with overrides. Overrides always win:
+
+  http://localhost:8000/streamer.html?layout=race&left=best
+
+
+3) Panel list (show / hide)
+---------------------------
+  obs=timer,map,items,best,log
+
+Comma-separated. Optional if you use layout= — the preset picks panels
+for you. Use obs= when you want an explicit list.
+
+  http://localhost:8000/streamer.html?layout=classic&obs=timer,map,items,best
+
+
+4) Building a URL from the tracker UI
+-------------------------------------
+1. Open tracker.html
+2. Click  Streamer URLs
+3. Pick a quick panel preset (optional)
+4. Choose a  Layout preset
+5. Or set Top / Left / Center / Right / Bottom dropdowns (switches to Custom)
+6. Set Host / Port for SNI if needed
+7. Copy the URL into an OBS Browser Source
+
+Tips:
+- Use one Browser Source per PC (SNI allows one device attach).
+- Prefer http://localhost:8000/streamer.html on the streaming machine.
+- Enable "Refresh browser when scene becomes active" in OBS if a layout
+  change does not appear immediately.
+- Modes and entrance notes still sync live from phone/desktop while the
+  overlay is open (tracker-server.py must be running).
+
+
+5) OBS setup (short)
+--------------------
+1. Start tracker-server.py
+2. Disconnect the main tracker from SNI (or leave it disconnected)
+3. Add Browser Source → paste your streamer URL
+4. Width/height: match your canvas (e.g. 1920x1080) or crop in OBS
+5. Place your game capture in the transparent center hole when using
+   layout=classic / race / focus_items / maps_left
+
+
+6) Troubleshooting
+------------------
+- Still seeing an old layout: restart tracker-server.py, re-copy the URL
+  (Copy adds a fresh cache-bust token), refresh the Browser Source.
+- Slots ignored: check spelling (maps not map in slot params; obs= still
+  uses map as the panel name).
+- Empty overlay: at least one slot must be a real module, or pass obs=.

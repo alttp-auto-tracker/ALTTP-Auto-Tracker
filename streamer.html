@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" href="assets/icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>ALTTP-AUTO-TRACKER — Stream Overlay</title>
+<link rel="stylesheet" href="css/tracker.css?v=60">
+<link rel="stylesheet" href="css/streamer.css?v=18">
+<meta name="theme-color" content="#100e1c">
+</head>
+<body class="stream-shell shape-square obs-mode obs-transparent" data-obs-panels="items map timer">
+<div class="wrap stream-wrap">
+
+  <header class="stream-hidden-chrome">
+    <div class="conn-form">
+      <label for="host">Host</label>
+      <input id="host" value="127.0.0.1">
+      <label for="port">Port</label>
+      <input id="port" value="23074">
+      <button id="connectBtn">Connect</button>
+    </div>
+    <div class="sync" id="syncIndicator">
+      <div class="node top" id="nodeSocket"></div>
+      <div class="bottom-row">
+        <div class="node" id="nodeDevice"></div>
+        <div class="node" id="nodeSync"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="seed-row-top stream-hidden-chrome">
+    <label for="seedCode">Seed</label>
+    <input id="seedCode">
+    <button id="loadSeedBtn">Load</button>
+    <button id="modeButton" class="btn practice">
+      <span class="mode-dot"></span>
+      <span class="mode-text">PRACTICE</span>
+    </button>
+  </div>
+
+  <div class="stream-layout">
+
+    <div class="stream-timer" id="colTimer">
+      <div class="timer-block" id="timerBlock" data-state="ready">
+        <div class="timer-heading stream-timer-heading">
+          <span>Run Timer</span>
+          <span id="streamBuildTag" class="stream-build-tag">v1.0.0</span>
+          <span id="streamSyncStatus" class="stream-sync-status" data-state="pending">Sync…</span>
+          <span class="timer-status" id="timerStatus">Ready</span>
+          <span class="stream-race-chip" id="streamRaceChip" data-mode="practice"><span class="stream-race-dot" aria-hidden="true"></span><span id="streamRaceChipText">Practice</span></span>
+          <span class="stream-rain-chip" id="rainChip" hidden data-state="clear" title="Standard prologue until Zelda is rescued"><span class="stream-rain-dot" aria-hidden="true"></span><span id="rainChipText">Rain</span></span>
+        </div>
+        <div class="timer-clock">
+          <div class="timer-display" id="timerDisplay">00:00:00</div>
+        </div>
+        <div class="timer-detail">
+          <div class="stream-mode-bar" id="randoModeRow" aria-label="Randomizer mode settings">
+            <div class="field">
+              <label for="worldModeSelect">World</label>
+              <select id="worldModeSelect"></select>
+            </div>
+            <div class="field">
+              <label for="keysModeSelect">Keys</label>
+              <select id="keysModeSelect"></select>
+            </div>
+            <div class="field">
+              <label for="bossModeSelect">Bosses</label>
+              <select id="bossModeSelect"></select>
+            </div>
+            <div class="field">
+              <label for="entranceModeSelect">Entrances</label>
+              <select id="entranceModeSelect"></select>
+            </div>
+          </div>
+          <div class="timer-message" id="timerMessage">Waiting for Link's first playable room.</div>
+          <div class="timer-last-pickup" id="timerLastPickup" hidden>
+            <span>Last pickup</span>
+            <strong id="timerLastPickupItem">—</strong>
+            <time id="timerLastPickupTime">—</time>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEFT: Spoiler route (Practice only) -->
+    <div class="stream-best" id="colBest">
+      <section id="stuckPracticePanel" class="stuck-stream-panel">
+        <h2 class="stuck-stream-title">Spoiler route</h2>
+        <p class="stuck-stream-race-note practice-race-note" id="practiceRaceNote" hidden>
+          Practice-only. Switch to <strong>PRACTICE</strong> for spoiler route.
+        </p>
+        <div class="stuck-panel" id="stuckPanel">
+          <div class="stuck-body" id="stuckBody">
+            <div class="spoiler-route" id="spoilerRoute">
+              <p class="spoiler-intro">Next obtainable progression item from the loaded seed spoiler.</p>
+              <div class="stuck-suggestion" id="spoilerSuggestion">
+                <p class="stuck-empty">Load a seed on the host tracker (Practice).</p>
+              </div>
+              <p class="spoiler-status" id="spoilerStatus" data-state="empty"></p>
+            </div>
+          </div>
+        </div>
+        <div class="stream-live-meta">
+          Room <span id="liveRoom">—</span>
+          / Area <span id="liveArea">—</span>
+          / Mode <span id="liveGameMode">—</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="stream-center" id="streamGameHole" aria-hidden="true"></div>
+
+    <!-- RIGHT: both maps stacked -->
+    <div class="stream-maps" id="colMaps">
+      <div class="dungeon-prizes" aria-labelledby="dungeonPrizesTitle">
+        <div class="dungeon-prizes-heading">
+          <div class="dungeon-prizes-summary">
+            <span id="dungeonPrizesTitle">Prizes</span>
+            <span class="dungeon-prizes-count" id="dungeonPrizeKnownCount">0/10</span>
+            <span class="dungeon-prizes-count" id="dungeonPrizeClaimedCount">0/10✓</span>
+            <span class="dungeon-prizes-count">P <b id="pendantCount">0/3</b></span>
+            <span class="dungeon-prizes-count">C <b id="crystalCount">0/7</b></span>
+          </div>
+          <div class="dungeon-prizes-actions">
+            <button id="clearDungeonPrizes" class="ghost dungeon-prizes-clear" type="button">Clear</button>
+          </div>
+        </div>
+        <div class="dungeon-prizes-body">
+          <div class="dungeon-prize-board">
+            <div class="dungeon-prize-grid" id="dungeonPrizeAssignments"></div>
+          </div>
+          <div class="medallion-row prize-medallions">
+            <div class="field">
+              <label for="mmMed">MM</label>
+              <select id="mmMed">
+                <option value="unknown">?</option>
+                <option value="bombos">Bombos</option>
+                <option value="ether">Ether</option>
+                <option value="quake">Quake</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="trMed">TR</label>
+              <select id="trMed">
+                <option value="unknown">?</option>
+                <option value="bombos">Bombos</option>
+                <option value="ether">Ether</option>
+                <option value="quake">Quake</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stream-map-label">Light World</div>
+      <div class="map-panel light" id="panelLight"><div class="panel-label"></div></div>
+      <div class="stream-map-label">Dark World</div>
+      <div class="map-panel dark" id="panelDark"><div class="panel-label"></div></div>
+    </div>
+
+    <!-- BOTTOM: keys (left/right via CSS) + centered items -->
+    <div class="stream-items col-items" id="colItems">
+      <section class="keysanity-section stream-keysanity" id="keysanityPanel" hidden>
+        <div class="keysanity-heading">
+          <h2>Dungeon Keys</h2>
+          <div class="keysanity-heading-meta">
+            <span class="keysanity-current">Keys: <b id="keysanityCurrentKeys">—</b></span>
+          </div>
+        </div>
+        <div class="keysanity-grid keysanity-grid-left" id="keysanityGrid"></div>
+        <div class="keysanity-grid keysanity-grid-right" id="keysanityGridRight"></div>
+      </section>
+      <section class="items-section">
+        <div class="items-heading">
+          <h2>Items</h2>
+          <div class="item-heading-controls">
+            <button id="itemToneToggle" class="ghost item-view-toggle" type="button">Bright Icons</button>
+            <button id="itemViewToggle" class="ghost item-view-toggle" type="button">Compact View</button>
+          </div>
+        </div>
+        <div class="grid item-grid" id="gridAll" data-view="detailed"></div>
+      </section>
+      <div id="dungeonStats" class="dstats-grid stream-dungeon-stats" hidden></div>
+    </div>
+  </div>
+
+  <div id="mapPanels" class="stream-hidden-chrome"></div>
+  <div id="worldTabs" class="stream-hidden-chrome">
+    <button type="button" class="world-tab" id="worldTabLight" data-world="light"></button>
+    <button type="button" class="world-tab" id="worldTabDark" data-world="dark"></button>
+  </div>
+  <div id="mapToolsWrap" class="stream-hidden-chrome">
+    <button id="mapToolsToggle" type="button"></button>
+    <div id="mapToolsPanel" hidden>
+      <button id="calibrateBtn" type="button"></button>
+      <button id="addMarkerBtn" type="button"></button>
+      <button id="renameBtn" type="button"></button>
+      <button id="exportBtn" type="button"></button>
+    </div>
+  </div>
+  <div id="mapInfo" class="stream-hidden-chrome"></div>
+  <div id="colLog" class="stream-hidden-chrome"><div class="log" id="log"></div></div>
+</div>
+
+<div class="run-history-modal" id="runHistoryModal" hidden>
+  <section class="run-history-dialog" role="dialog" aria-modal="true" aria-labelledby="runHistoryTitle">
+    <header class="run-history-header">
+      <div>
+        <span class="run-history-kicker">Local Run Library</span>
+        <h2 id="runHistoryTitle">Run History</h2>
+      </div>
+      <div class="run-history-header-actions">
+        <span id="runHistoryCount">0 runs</span>
+        <button type="button" id="runHistoryClose" class="ghost" aria-label="Close">×</button>
+      </div>
+    </header>
+    <p class="run-history-intro">Runs are saved on this device.</p>
+    <div class="run-history-list" id="runHistoryList"></div>
+    <footer class="run-history-footer">
+      <div class="run-history-compare-controls">
+        <button type="button" id="compareRuns" disabled>Compare Selected</button>
+        <button type="button" id="downloadRunComparison" class="ghost" disabled>Download Comparison</button>
+        <span id="runComparisonSelection">0 of 2 selected</span>
+      </div>
+      <div class="run-history-library-controls">
+        <button type="button" id="exportRunLibrary" class="ghost">Export</button>
+        <button type="button" id="importRunLibrary" class="ghost">Import</button>
+        <input type="file" id="importRunLibraryFile" accept="application/json,.json" hidden>
+      </div>
+    </footer>
+  </section>
+</div>
+
+<script src="js/constants.js?v=56"></script>
+<script src="js/state.js?v=46"></script>
+<script src="js/memory.js?v=48"></script>
+<script src="js/dungeonData.js?v=2"></script>
+<script src="js/requirements.js?v=10"></script>
+<script src="js/entrance.js?v=4"></script>
+<script src="js/logic.js?v=42"></script>
+<script src="js/navigator.js"></script>
+<script src="js/areas.js"></script>
+<script src="js/settings.js?v=11"></script>
+<script src="js/sni.js"></script>
+<script src="js/playerSprite.js?v=53"></script>
+<script src="js/ui.js?v=58"></script>
+<script src="js/dungeon.js?v=2"></script>
+<script src="js/map.js?v=61"></script>
+<script src="js/timer.js?v=51"></script>
+<script src="js/runData.js?v=48"></script>
+<script src="js/report.js?v=60"></script>
+<script src="js/comparison.js?v=53"></script>
+<script src="js/runHistory.js?v=54"></script>
+<script src="js/celebrate.js?v=2"></script>
+<script src="js/export.js?v=55"></script>
+<script src="js/seed.js"></script>
+<script src="js/tracker.js?v=54"></script>
+<script src="js/streamer.js?v=12"></script>
+<script src="js/mobileTabs.js?v=1"></script>
+<script src="js/controllerMode.js?v=1"></script>
+<script src="js/controlSync.js?v=1"></script>
+<script src="js/main.js?v=48"></script>
+<script src="js/pwa.js?v=1"></script>
+</body>
+</html>

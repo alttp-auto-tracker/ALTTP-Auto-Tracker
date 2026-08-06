@@ -1,0 +1,1019 @@
+/* ============================================================
+   streamer.css — OBS overlay for streamer.html
+
+   ┌──────────────────── timer ────────────────────┐
+   │ Best Play │       GAME        │ Light Map     │
+   │           │                   │ Dark Map      │
+   ├───────────┴───────────────────┴───────────────┤
+   │              Items (compact / bright)         │
+   └───────────────────────────────────────────────┘
+   ============================================================ */
+
+html.obs-mode-html,
+body.stream-shell{
+  background:transparent!important;
+}
+
+body.stream-shell{
+  margin:0;
+  padding:6px;
+  min-height:100vh;
+  overflow:hidden;
+  background:transparent!important;
+}
+
+body.stream-shell .stream-wrap{
+  max-width:none;
+  margin:0;
+  background:transparent!important;
+}
+
+/* Hide chrome, dungeon list, connect bar, map tools */
+body.stream-shell .stream-hidden-chrome,
+body.stream-shell .mobile-tab-bar,
+body.stream-shell .streamer-launch-button,
+body.stream-shell #dungeonStats,
+body.stream-shell .stream-dungeon-stats,
+body.stream-shell .dstats-grid,
+body.stream-shell .dungeon-row,
+body.stream-shell .world-tabs,
+body.stream-shell #mapInfo,
+body.stream-shell .stream-map-info,
+body.stream-shell .map-tools,
+body.stream-shell .map-section-heading,
+body.stream-shell .map-legend,
+body.stream-shell .stream-live-meta,
+body.stream-shell .stream-connect-bar,
+body.stream-shell #streamConnectBar,
+body.stream-shell .obs-status{
+  display:none!important;
+}
+
+/* ---- Grid ---- */
+.stream-layout{
+  display:grid;
+  grid-template-columns:minmax(220px,24%) minmax(0,1fr) minmax(170px,22%);
+  grid-template-rows:auto minmax(0,1fr) auto;
+  grid-template-areas:
+    "timer  timer  timer"
+    "best   game   maps"
+    "items  items  items";
+  gap:6px;
+  height:calc(100vh - 12px);
+  min-height:0;
+}
+
+.stream-timer{grid-area:timer;}
+.stream-best{grid-area:best;min-height:0;overflow:hidden;}
+.stream-center{grid-area:game;}
+.stream-maps{grid-area:maps;min-height:0;overflow:auto;}
+.stream-items{grid-area:items;min-height:0;overflow:auto;}
+
+/* Cards */
+.stream-timer .timer-block,
+.stream-best,
+.stream-maps,
+.stream-items{
+  border:1px solid rgba(56,50,86,.85);
+  border-radius:10px;
+  background:rgba(16,14,28,.92);
+  backdrop-filter:blur(4px);
+}
+
+.stream-timer .timer-block{
+  /* OBS: status chips | centered clock | status message — display only */
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  gap:10px 18px;
+  margin:0;
+  padding:8px 16px;
+}
+.stream-timer .stream-timer-heading{
+  grid-column:1;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px 8px;
+  min-width:0;
+  justify-self:start;
+}
+.stream-timer .stream-build-tag{
+  margin-left:0;
+  font-size:.55rem;
+  opacity:.55;
+  letter-spacing:.06em;
+}
+.stream-timer .timer-clock{
+  grid-column:2;
+  min-width:0;
+  text-align:center;
+  justify-self:center;
+}
+.stream-timer .timer-display{
+  font-size:2rem;
+  letter-spacing:.06em;
+  text-align:center;
+  line-height:1.05;
+}
+.stream-timer .timer-detail{
+  grid-column:3;
+  border-left:1px solid rgba(56,50,86,.85);
+  padding-left:14px;
+  min-width:0;
+  text-align:left;
+  justify-self:stretch;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:5px;
+}
+.stream-timer .stream-mode-bar{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:6px 8px;
+  margin:0;
+  padding:0;
+  border:0;
+  background:transparent;
+}
+.stream-timer .stream-mode-bar .field{
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  min-width:0;
+}
+.stream-timer .stream-mode-bar label{
+  font-size:.5rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-dim, #948da8);
+  line-height:1.1;
+}
+.stream-timer .stream-mode-bar select{
+  background:#161326;
+  color:var(--gold, #d8b45c);
+  border:1px solid var(--border, #383256);
+  border-radius:6px;
+  padding:3px 6px;
+  font-size:.68rem;
+  font-weight:600;
+  min-width:108px;
+  max-width:132px;
+}
+.stream-timer .stream-mode-bar select:focus{
+  outline:2px solid var(--gold-dim, rgba(216,180,92,.55));
+}
+.stream-timer .timer-message{
+  text-align:right;
+  font-size:.62rem;
+  width:100%;
+}
+.stream-timer .timer-last-pickup{
+  justify-content:flex-end;
+  width:100%;
+}
+.stream-timer .timer-controls{
+  display:none !important;
+}
+
+.stream-center{min-height:80px;}
+
+/* Left: Best Play only */
+.stream-best{
+  padding:8px 10px;
+}
+.stream-best .best-play{
+  margin:0;
+  padding:8px 10px;
+  border:none;
+  background:transparent;
+}
+.stream-best .best-dungeon{font-size:1.15rem;}
+.stream-best .next-plays{margin-top:8px;}
+.stream-best .items-section{display:none!important;}
+
+/* Right: stacked maps — must fit without internal scroll */
+.stream-maps{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:6px;
+  min-height:0;
+  overflow:hidden !important; /* no scrollbar on stream */
+}
+.stream-map-label{
+  flex:0 0 auto;
+  font-size:.5rem;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--gold);
+  padding:0 2px;
+  line-height:1.1;
+}
+.stream-maps .map-panel{
+  /* Share remaining column height equally; never force page scroll */
+  position:relative;
+  width:100%;
+  flex:1 1 0;
+  min-height:0;
+  max-height:none;
+  aspect-ratio:auto;
+  overflow:hidden;
+  border-radius:8px;
+  background-size:cover !important;
+  background-position:center !important;
+}
+.stream-maps .dungeon-prizes{
+  margin:0;
+  padding:2px 4px;
+  flex:0 0 auto;
+  max-height:none;
+  overflow:hidden;
+}
+.stream-maps .prize-medallions{transform:none;margin:0;}
+.stream-maps .dungeon-prize-grid{
+  grid-template-columns:repeat(5,minmax(24px,1fr));
+  gap:2px;
+}
+.stream-maps .dungeon-prize-visual,
+.stream-maps .dungeon-prize-diamond{width:16px;height:16px;}
+
+body.stream-shell .marker{width:10px;height:10px;}
+body.stream-shell .marker.dungeon{width:12px;height:11px;}
+body.stream-shell .dungeon-marker-label{font-size:.4rem;padding:0 2px;}
+
+/* Bottom: items strip — capped so maps never need to scroll */
+.stream-items{
+  padding:6px 10px 8px;
+  max-height:min(26vh, 220px);
+  overflow:hidden !important;
+}
+body.stream-shell:has(#keysanityPanel:not([hidden])) .stream-items{
+  max-height:min(28vh, 240px);
+}
+.stream-items .stream-command,
+.stream-items .best-play,
+.stream-items .next-plays{
+  display:none!important;
+}
+.stream-items h2{
+  margin:0 0 4px;
+  font-size:.62rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--gold);
+}
+.stream-items .items-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:4px;
+}
+.stream-items .item-grid{gap:3px;}
+.stream-items .item-view-toggle{font-size:.52rem;padding:2px 6px;}
+
+/* Prefer a horizontal-ish item strip when space allows */
+body.stream-shell .item-grid.compact{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+}
+
+#finishRunButton{
+  border-color:rgba(90,167,143,.65);
+  color:#78c7ae;
+}
+
+@media (max-width:900px){
+  .stream-layout{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "timer"
+      "best"
+      "maps"
+      "items";
+    height:auto;
+    overflow:auto;
+  }
+  .stream-center{display:none;}
+}
+
+/* ---- Items strip: centered title, 2×15 grid, no toggles ---- */
+body.stream-shell .stream-items{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:center;
+  padding:10px 16px 12px;
+  width:100%;
+  box-sizing:border-box;
+}
+
+body.stream-shell .stream-items .items-section{
+  width:100%;
+  margin:0 auto;
+}
+
+body.stream-shell .stream-items .items-heading{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:8px;
+  min-height:18px;
+}
+
+body.stream-shell .stream-items .items-heading h2{
+  margin:0;
+  text-align:center;
+}
+
+/* Hide Bright / Compact / Detailed toggles on stream overlay */
+body.stream-shell .stream-items .item-heading-controls,
+body.stream-shell #itemToneToggle,
+body.stream-shell #itemViewToggle{
+  display:none !important;
+}
+
+/* 15 columns → 2 even rows for 30 items */
+body.stream-shell .stream-items .item-grid,
+body.stream-shell .stream-items .item-grid.compact{
+  display:grid !important;
+  grid-template-columns:repeat(15, 38px);
+  justify-content:center;
+  justify-items:center;
+  align-items:center;
+  gap:6px 7px !important;
+  margin:0 auto;
+  width:max-content;
+  max-width:100%;
+}
+
+body.stream-shell .stream-items .item-tile{
+  width:38px;
+  min-height:0;
+  margin:0;
+}
+
+body.stream-shell .stream-items .item-grid.compact .item-icon-frame,
+body.stream-shell .stream-items .item-grid.compact .item-icon{
+  width:32px;
+  height:32px;
+}
+
+/* ---- Items in left/right (narrow column) — vertical pack ---- */
+body.stream-shell .stream-items.stream-items-narrow{
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:stretch;
+  padding:8px 8px 10px;
+  min-height:0;
+  overflow:auto;
+  height:100%;
+  box-sizing:border-box;
+}
+body.stream-shell .stream-items.stream-items-narrow .items-section{
+  width:100%;
+  margin:0;
+}
+body.stream-shell .stream-items.stream-items-narrow .items-heading{
+  margin-bottom:6px;
+}
+body.stream-shell .stream-items.stream-items-narrow .item-grid,
+body.stream-shell .stream-items.stream-items-narrow .item-grid.compact{
+  display:grid !important;
+  /* 5 cols × 6 rows fits ~30 items in a ~220–280px side column */
+  grid-template-columns:repeat(5, minmax(0, 1fr));
+  justify-content:center;
+  justify-items:center;
+  align-items:center;
+  gap:5px 4px !important;
+  width:100%;
+  max-width:100%;
+  margin:0;
+}
+body.stream-shell .stream-items.stream-items-narrow .item-tile{
+  width:100%;
+  max-width:42px;
+  min-height:0;
+  margin:0;
+}
+body.stream-shell .stream-items.stream-items-narrow .item-grid.compact .item-icon-frame,
+body.stream-shell .stream-items.stream-items-narrow .item-grid.compact .item-icon{
+  width:30px;
+  height:30px;
+}
+
+/* Missing items: lighter silhouette */
+body.stream-shell .item-tile:not(.on) .item-icon{
+  opacity:.75 !important;
+  filter:grayscale(.2) saturate(.75) brightness(1.2) contrast(1.05) !important;
+}
+body.stream-shell .item-tile:not(.on) .item-icon-frame{
+  opacity:.95;
+  background:rgba(255,255,255,.07);
+}
+body.stream-shell .item-tile.on .item-icon{
+  opacity:1 !important;
+  filter:none !important;
+}
+body.stream-shell .item-tile.on .item-icon-frame::after{
+  background:transparent !important;
+}
+
+/* Compact keysanity strip on the stream overlay */
+.stream-shell .stream-keysanity{
+  margin:0 0 8px;
+  padding:6px 8px;
+}
+.stream-shell .stream-keysanity .keysanity-note{display:none;}
+.stream-shell .stream-keysanity .keysanity-grid{
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:4px;
+}
+.stream-shell .stream-keysanity .keysanity-row{
+  padding:3px 5px;
+  font-size:.6rem;
+}
+.stream-shell .stream-keysanity .keysanity-tile,
+.stream-shell .keysanity-tile{
+  min-height:0;
+  padding:3px 4px;
+  gap:2px;
+}
+.stream-shell .keysanity-key-badge{
+  width:28px;
+  height:22px;
+  font-size:.62rem;
+}
+.stream-shell .ks-key-count{font-size:.7rem;}
+.stream-shell .keysanity-abbr{font-size:.55rem;}
+.stream-shell .ks-flag{font-size:.45rem;padding:0 2px;}
+
+
+/* Keys left + Items right, pair centered in the bottom card */
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])){
+  flex-direction:row;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:center;
+  gap:14px 28px;
+  padding:10px 16px 12px;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .stream-keysanity{
+  flex:0 1 auto;
+  width:auto;
+  max-width:min(460px,48%);
+  margin:0;
+  padding:4px 6px;
+  border:none;
+  background:transparent;
+  align-self:center;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .items-section{
+  flex:0 1 auto;
+  width:auto;
+  max-width:min(560px,50%);
+  margin:0;
+  align-self:center;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-heading{
+  justify-content:center;
+  margin-bottom:4px;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  justify-content:center;
+  grid-template-columns:none;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .items-heading{
+  justify-content:center;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .item-grid.compact,
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .item-grid{
+  justify-content:center;
+}
+
+/* ---- Unified keys + items bar (one background, matched height) ---- */
+body.stream-shell .stream-items{
+  background:rgba(16,14,28,.92) !important;
+  border:1px solid rgba(56,50,86,.85);
+  border-radius:10px;
+}
+
+/* Kill nested panel look — keys and items share the outer card only */
+body.stream-shell .stream-items .items-section,
+body.stream-shell .stream-items .stream-keysanity,
+body.stream-shell .stream-items .keysanity-section,
+body.stream-shell .stream-items .keysanity-grid,
+body.stream-shell .stream-items .item-grid{
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  border-radius:0 !important;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])){
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:nowrap;
+  align-items:stretch !important;   /* equal column height */
+  justify-content:center;
+  gap:18px 28px;
+  padding:10px 18px 12px;
+  min-height:0;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .stream-keysanity,
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-section{
+  display:flex !important;
+  flex-direction:column;
+  justify-content:center;           /* vertically center keys with items */
+  align-items:center;
+  flex:0 1 auto;
+  width:auto;
+  max-width:none;
+  margin:0 !important;
+  padding:0 !important;
+  align-self:stretch;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .items-section{
+  display:flex !important;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  flex:0 1 auto;
+  width:auto;
+  max-width:none;
+  margin:0 !important;
+  padding:0 !important;
+  align-self:stretch;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-heading,
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .items-heading{
+  justify-content:center;
+  width:100%;
+  margin-bottom:6px;
+  min-height:18px;
+}
+
+/* Compact 2-column keys block so height stays close to the 2-row item grid */
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-grid{
+  display:grid !important;
+  grid-template-columns:repeat(2, max-content);
+  gap:3px 8px;
+  justify-content:center;
+  align-content:center;
+  width:max-content;
+  max-width:100%;
+  margin:0 auto;
+  flex:1 1 auto;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-row,
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-tile{
+  padding:2px 5px;
+  font-size:.58rem;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.04);
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .item-grid,
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .item-grid.compact{
+  margin:0 auto;
+}
+
+/* ---- Keys | Items | Keys  (split around the item grid) ---- */
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])){
+  display:grid !important;
+  grid-template-columns:auto minmax(0,max-content) auto;
+  grid-template-rows:auto auto;
+  justify-content:center;
+  align-items:center;
+  column-gap:22px;
+  row-gap:4px;
+  padding:10px 16px 12px;
+}
+
+/* Let keys heading + left/right grids participate in the parent grid */
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) #keysanityPanel{
+  display:contents !important;
+  background:transparent !important;
+  border:none !important;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-heading{
+  grid-column:1 / -1;
+  grid-row:1;
+  justify-content:center;
+  width:100%;
+  margin:0 0 2px;
+  min-height:16px;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-grid-left,
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) #keysanityGrid{
+  grid-column:1;
+  grid-row:2;
+  display:grid !important;
+  grid-template-columns:1fr;
+  gap:3px;
+  width:max-content;
+  max-width:100%;
+  margin:0;
+  align-content:center;
+  justify-items:stretch;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-grid-right,
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) #keysanityGridRight{
+  grid-column:3;
+  grid-row:2;
+  display:grid !important;
+  grid-template-columns:1fr;
+  gap:3px;
+  width:max-content;
+  max-width:100%;
+  margin:0;
+  align-content:center;
+  justify-items:stretch;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .items-section{
+  grid-column:2;
+  grid-row:2;
+  display:flex !important;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  margin:0 !important;
+  padding:0 !important;
+  background:transparent !important;
+  border:none !important;
+  width:auto;
+  max-width:none;
+}
+
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-row,
+body.stream-shell .stream-items:has(#keysanityPanel:not([hidden])) .keysanity-tile{
+  padding:2px 6px;
+  font-size:.58rem;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.04);
+}
+
+/* Right-side keys: Cmp Map BK · keys · name (mirror of left) */
+body.stream-shell .keysanity-row-mirror{
+  grid-template-columns:auto 1fr auto !important;
+  direction:ltr;
+}
+body.stream-shell .keysanity-row-mirror .keysanity-flags{
+  order:0;
+}
+body.stream-shell .keysanity-row-mirror .keysanity-keys{
+  order:1;
+  justify-content:flex-end;
+}
+body.stream-shell .keysanity-row-mirror .keysanity-abbr{
+  order:2;
+  text-align:right;
+}
+
+/* ---- Stream polish ---- */
+/* Quieter keys/items headings */
+body.stream-shell .stream-items .keysanity-heading h2,
+body.stream-shell .stream-items .items-heading h2{
+  font-size:.55rem;
+  letter-spacing:.12em;
+  opacity:.85;
+}
+body.stream-shell .stream-items .keysanity-heading-meta{
+  font-size:.55rem;
+  opacity:.7;
+}
+
+/* Race Legal chip on stream timer */
+body.stream-shell .stream-race-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-left:8px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid rgba(90,167,143,.55);
+  background:rgba(90,167,143,.12);
+  color:#78c7ae;
+  font-size:.55rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+body.stream-shell .stream-race-chip[data-mode="practice"]{
+  border-color:rgba(226,189,71,.5);
+  background:rgba(226,189,71,.1);
+  color:#e2bd47;
+}
+body.stream-shell .stream-race-chip .stream-race-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:currentColor;
+}
+
+/* Tighter map dungeon labels on overlay */
+body.stream-shell .dungeon-marker-label{
+  font-size:.38rem;
+  padding:0 2px;
+  max-width:72px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+body.stream-shell .marker.dungeon.keys-mode .dungeon-marker-label{
+  font-size:.36rem;
+  max-width:88px;
+}
+
+
+/* Standard rain chip on stream timer */
+body.stream-shell .stream-rain-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin-left:6px;
+  padding:2px 8px;
+  border-radius:999px;
+  border:1px solid rgba(110,168,220,.55);
+  background:rgba(70,130,190,.14);
+  color:#8ec5ef;
+  font-size:.55rem;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+body.stream-shell .stream-rain-chip[hidden]{ display:none !important; }
+body.stream-shell .stream-rain-chip .stream-rain-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:currentColor;
+  box-shadow:0 0 6px currentColor;
+  animation:stream-rain-pulse 1.6s ease-in-out infinite;
+}
+@keyframes stream-rain-pulse{
+  0%,100%{ opacity:1; }
+  50%{ opacity:.45; }
+}
+body.stream-shell .stream-rain-chip[data-state="clear"]{
+  border-color:rgba(90,167,143,.45);
+  background:rgba(90,167,143,.1);
+  color:#78c7ae;
+}
+body.stream-shell .stream-rain-chip[data-state="clear"] .stream-rain-dot{
+  animation:none;
+}
+
+.stream-sync-status{
+  margin-left:6px;
+  font-size:.52rem;
+  letter-spacing:.04em;
+  color:var(--text-dim,#948da8);
+  opacity:.85;
+}
+.stream-sync-status[data-state="ok"]{color:#7dcea0;}
+.stream-sync-status[data-state="pending"]{color:#948da8;}
+
+/* Log panel when explicitly slotted onto the stream layout */
+body.stream-shell #colLog.stream-log-visible,
+body.stream-shell .stream-log-visible{
+  display:block!important;
+  grid-area:log;
+  min-height:0;
+  overflow:auto;
+  padding:8px 10px;
+  border:1px solid rgba(56,50,86,.85);
+  border-radius:10px;
+  background:rgba(16,14,28,.92);
+  font-size:.62rem;
+}
+
+/* Dungeon Command Center on stream (Practice) */
+.stream-command-center{
+  margin:0;
+  padding:8px 10px;
+  border:none;
+  background:transparent;
+  height:100%;
+  overflow:auto;
+}
+.stream-command-center > h2{
+  margin:0 0 6px;
+  padding:0;
+  border:0;
+  font-size:.62rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--gold,#d8b45c);
+}
+.stream-command-center .best-play{
+  margin:0;
+  padding:8px 10px;
+  border:1px solid rgba(56,50,86,.75);
+  border-radius:8px;
+  background:rgba(16,14,28,.55);
+}
+.stream-command-center .stuck-panel{
+  margin-top:8px;
+}
+.stream-command-center .stuck-body{
+  margin-top:6px;
+}
+.stream-command-center .stuck-intro{
+  font-size:.58rem;
+  line-height:1.35;
+  color:var(--text-dim,#948da8);
+}
+/* Race Legal: hide coaching body, keep a compact note if the slot is visible */
+
+
+
+/* Race Legal on stream: hide coaching only, keep left column grid space */
+body.stream-shell.stream-race-legal #colBest .stream-command-center,
+body.stream-shell.stream-race-legal #colBest #dungeonCommandCenter{
+  opacity:0;
+  pointer-events:none;
+}
+body.stream-shell.stream-race-legal #colBest{
+  /* keep grid slot */
+  min-width:0;
+}
+body.stream-shell .stream-timer .timer-block[data-state="disconnected"]{
+  border-color:rgba(56,50,86,.9) !important;
+  box-shadow:none !important;
+}
+body.stream-shell .stream-timer .timer-block[data-state="disconnected"] .timer-status{
+  color:#b9a8b0 !important;
+  border-color:rgba(120,100,110,.45) !important;
+  background:rgba(40,32,40,.55);
+}
+
+
+/* Keysanity-on: keep maps column fully visible (no scroll) */
+body.stream-shell .stream-maps .dungeon-prize-grid{
+  grid-template-columns:repeat(5,minmax(20px,1fr));
+  gap:1px;
+}
+body.stream-shell .stream-maps .dungeon-prizes-heading{
+  margin:0 0 2px;
+  gap:4px;
+  font-size:.55rem;
+}
+body.stream-shell .stream-maps .dungeon-prizes-actions,
+body.stream-shell .stream-maps .dungeon-prizes-clear{
+  transform:scale(0.9);
+  transform-origin:right center;
+}
+body.stream-shell .stream-maps .prize-medallions{
+  gap:4px;
+  margin-top:2px;
+}
+body.stream-shell .stream-maps .prize-medallions select{
+  padding:2px 4px;
+  font-size:.58rem;
+  min-width:0;
+}
+body.stream-shell .stream-maps .prize-medallions label{
+  font-size:.5rem;
+}
+/* Markers scale down slightly when maps are squeezed */
+body.stream-shell .stream-maps .marker{width:8px;height:8px;}
+body.stream-shell .stream-maps .marker.dungeon{width:10px;height:9px;}
+body.stream-shell .stream-maps .dungeon-marker-label{font-size:.36rem;padding:0 1px;}
+
+/* Ensure main grid middle row can shrink */
+body.stream-shell .stream-layout{
+  grid-template-rows:auto minmax(0,1fr) auto;
+  overflow:hidden;
+}
+body.stream-shell .stream-best,
+body.stream-shell .stream-maps,
+body.stream-shell .stream-items{
+  min-height:0;
+}
+
+/* v23: instant item state on OBS — no CSS fade lag */
+body.stream-shell .item-tile .item-icon,
+body.stream-shell .tile,
+body.obs-mode .item-tile .item-icon,
+body.obs-mode .tile{
+  transition:none !important;
+}
+body.stream-shell .item-tile.item-pickup-flash,
+body.obs-mode .item-tile.item-pickup-flash{
+  animation-duration:.35s !important;
+}
+
+/* v25: force instant collected look — kill every opacity/filter/background fade */
+body.stream-shell .item-tile,
+body.stream-shell .item-tile .badge,
+body.stream-shell .item-tile .item-icon-frame,
+body.stream-shell .item-tile .item-icon-frame::after,
+body.stream-shell .item-tile .item-icon,
+body.stream-shell .item-tile .label,
+body.obs-mode .item-tile,
+body.obs-mode .item-tile .item-icon,
+body.obs-mode .item-tile .item-icon-frame::after{
+  transition: none !important;
+  animation: none !important;
+}
+body.stream-shell .item-tile.on .item-icon,
+body.obs-mode .item-tile.on .item-icon{
+  opacity: 1 !important;
+  filter: none !important;
+}
+body.stream-shell .item-tile:not(.on) .item-icon,
+body.obs-mode .item-tile:not(.on) .item-icon{
+  /* keep dim silhouette but no animated morph into "on" */
+  transition: none !important;
+}
+body.stream-shell .item-tile.item-pickup-flash,
+body.obs-mode .item-tile.item-pickup-flash{
+  animation: none !important;
+}
+
+
+/* Live Link sprite must sit above map tiles on the stream overlay */
+body.stream-shell .player-map-marker{
+  z-index:80 !important;
+  pointer-events:none;
+}
+body.stream-shell .player-map-marker:not([hidden]){
+  display:block !important;
+}
+body.stream-shell .player-map-marker span{
+  font-size:.45rem;
+  opacity:.95;
+}
+body.stream-shell .stuck-stream-panel{
+  padding:8px 10px;
+  height:100%;
+  box-sizing:border-box;
+  overflow:hidden;
+}
+body.stream-shell .stuck-stream-title{
+  margin:0 0 8px;
+  font-size:.72rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--gold);
+}
+body.stream-shell.stream-race-legal #colBest .stuck-panel{
+  display:none !important;
+}
+
+
+/* allow pulse/glow outside marker box */
+}
+
+
+/* I'm Stuck — pulse + line must read on the compact stream maps */
+body.stream-shell .stream-maps .map-panel{
+  overflow:visible !important;
+}
+body.stream-shell .stuck-guide-svg{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  z-index:100 !important;
+  pointer-events:none !important;
+  overflow:visible !important;
+}
+body.stream-shell .stuck-guide-line{
+  stroke:#58c9ff !important;
+  stroke-width:0.9 !important;
+  stroke-dasharray:2.5 1.5 !important;
+  opacity:1 !important;
+}
+body.stream-shell .stuck-guide-end{
+  fill:#58c9ff !important;
+  r:2 !important;
+}
+body.stream-shell .marker.stuck-target{
+  z-index:110 !important;
+  outline:3px solid #58c9ff !important;
+  box-shadow:0 0 0 4px rgba(88,201,255,.9), 0 0 16px rgba(88,201,255,.8) !important;
+  animation:stuck-target-pulse-stream 0.9s ease-in-out infinite !important;
+}
+@keyframes stuck-target-pulse-stream{
+  0%,100%{ transform:translate(-50%,-50%) scale(1); }
+  50%{ transform:translate(-50%,-50%) scale(1.7); }
+}
