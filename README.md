@@ -30,7 +30,7 @@ Entrances: Vanilla / Shuffle*<BR>
 
 
 List of Features:
-<small-Permalink seed link upload <BR>
+<small>-Permalink seed link upload <BR>
 -Controller mode (phone / website) <BR>
 -Item Tracker (detailed view option) <BR>
 -Entrance notes for entrance shuffle <BR>
