@@ -30,19 +30,19 @@ Entrances: Vanilla / Shuffle*<BR>
 
 
 List of Features:
--Permalink seed intagration
--Controller mode (phone / website)
--Item Tracker (detailed view option)
--Entrance notes for entrance shuffle
--Auto Crystal 
--Practice mode / Race legal
--Spoiler Route (Practice mode only) Will show you where the item is and highlight the map marker
--Screenshots of chests (Practice mode only) - WIP
--Run History with notes, compare two runs.
--Certification upon completed game
--Timer that auto starts on a run, pauses when on menu / save and quit
--OBS Streamer browser URL
--Live Sprite tracker on map
+-Permalink seed integration <BR>
+-Controller mode (phone / website) <BR>
+-Item Tracker (detailed view option) <BR>
+-Entrance notes for entrance shuffle <BR>
+-Auto Crystal / Pendent  <BR>
+-Practice mode / Race legal <BR>
+-Spoiler Route (Practice mode only) Will show you where the item is and highlight the map marker<BR>
+-Screenshots of chests (Practice mode only) - WIP<BR>
+-Run History with notes, compare two runs<BR>
+-Certification upon completed game<BR>
+-Timer that auto starts on a run, pauses when on menu / save and quit<BR>
+-OBS Streamer browser URL<BR>
+-Live Sprite tracker on map<BR>
 -
 
 ---
