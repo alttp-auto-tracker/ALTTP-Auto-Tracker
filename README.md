@@ -16,7 +16,7 @@ Connect one browser to SNI for live memory, use another (or your phone) as a con
 **Current version:** **1.0.0** · Service worker cache **v1**
 
 
-![Main tracker](docs/screenshots/tracker-main.png)
+![Main tracker](docs/screenshots/tracker-main.PNG)
 ---
 
 ## Quick start
