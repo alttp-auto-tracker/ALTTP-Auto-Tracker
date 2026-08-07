@@ -20,12 +20,7 @@ Connect one browser to SNI for live memory, use another (or your phone) as a con
 **Tracker Main Screen:**
 ![Main tracker](docs/screenshots/tracker-main.PNG)
 
-**Tracker Mode Types Example**<BR>
-World: Standard / Open / Inverted<BR>
-Keys: Standard / Keysanity / Keys Only / Map Compass / Map Compass Small / Map Compass Big<BR>
-Bosses: Normal / Boss Shuffle <BR>
-Entrances: Vanilla / Shuffle*<BR>
-*Shuffle has Entrance notes by clicking on a marker 
+**Tracker Mode Types Example**
 ![Tracker Modes](docs/screenshots/tracker-modes.PNG)
 
 
