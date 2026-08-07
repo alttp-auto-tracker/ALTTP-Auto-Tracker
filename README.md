@@ -28,6 +28,23 @@ Entrances: Vanilla / Shuffle*<BR>
 *Shuffle has Entrance notes by clicking on a marker 
 ![Tracker Modes](docs/screenshots/tracker-modes.PNG)
 
+
+List of Features:
+-Permalink seed intagration
+-Controller mode (phone / website)
+-Item Tracker (detailed view option)
+-Entrance notes for entrance shuffle
+-Auto Crystal 
+-Practice mode / Race legal
+-Spoiler Route (Practice mode only) Will show you where the item is and highlight the map marker
+-Screenshots of chests (Practice mode only) - WIP
+-Run History with notes, compare two runs.
+-Certification upon completed game
+-Timer that auto starts on a run, pauses when on menu / save and quit
+-OBS Streamer browser URL
+-Live Sprite tracker on map
+-
+
 ---
 
 ## Quick start
