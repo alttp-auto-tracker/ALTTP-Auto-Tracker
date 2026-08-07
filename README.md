@@ -54,7 +54,7 @@ After code updates: hard-refresh the browser (or bump `CACHE_VERSION` in `servic
 | Keys | Standard · Keysanity · Keys · MC · MCS · MCBK |
 | Bosses | Normal · Shuffled |
 | Entrances | Vanilla · Shuffled |
-| Race | **Practice** (full coaching tools) · **Race Legal** (spoiler tools hidden) |
+| Race | **Practice** (coaching tools) · **Race Legal** (spoiler tools hidden) |
 
 ### Controller mode & phone
 - Toggle **Controller mode** / **Full tracker** (or open with `?controller=1`).
@@ -73,7 +73,7 @@ After code updates: hard-refresh the browser (or bump `CACHE_VERSION` in `servic
 - Presets: `classic`, `race`, `focus_items`, `maps_left`, `timer_only`, `items_only`, `maps_only`, …
 - Or assign modules (`timer`, `maps`, `items`, `stuck`/`spoiler`, `game`, …) to `top` / `left` / `center` / `right` / `bottom` via URL params.
 - Use the in-tracker **Streamer URLs** modal to build links quickly.
-- See [docs/STREAM-LAYOUT.txt](docs/STREAM-LAYOUT.txt) for full details.
+
 
 ### Other
 - Light / Dark world maps with prize markers and partial-fill support.
@@ -93,7 +93,6 @@ After code updates: hard-refresh the browser (or bump `CACHE_VERSION` in `servic
 - **OBS Studio** if you want the stream overlay
 - Emulator (Snes9x, RetroArch, …) or hardware (FX Pak Pro / SD2SNES) feeding SNI
 
-Linux + OBS + SNI walkthrough: [docs/LINUX-SETUP.txt](docs/LINUX-SETUP.txt)
 
 ---
 
