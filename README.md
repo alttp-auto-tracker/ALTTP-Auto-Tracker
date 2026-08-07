@@ -29,20 +29,23 @@ Entrances: Vanilla / Shuffle*<BR>
 ![Tracker Modes](docs/screenshots/tracker-modes.PNG)
 
 
-List of Features:
-<small>-Permalink seed link upload <BR>
--Controller mode (phone / website) <BR>
--Item Tracker (detailed view option) <BR>
--Entrance notes for entrance shuffle <BR>
--Auto Crystal / Pendent  <BR>
--Practice mode / Race legal <BR>
--Spoiler Route (Practice mode only) Will show you where the item is and highlight the map marker<BR>
--Screenshots of chests (Practice mode only) - WIP<BR>
--Run History with notes, compare two runs<BR>
--Certification upon completed game<BR>
--Timer that auto starts on a run, pauses when on menu / save and quit<BR>
--OBS Streamer browser URL<BR>
--Live Sprite tracker on map<BR></small>
+## Features
+
+- Permalink / seed link upload
+- Controller mode (phone / website)
+- Item tracker (detailed view option)
+- Entrance notes for entrance shuffle
+- Auto crystal / pendant tracking
+- Practice mode / Race Legal
+- Spoiler route (Practice only) — next item + map marker highlight
+- Chest screenshots (Practice only, vanilla modes) — WIP
+- Run history with notes; compare two runs
+- Certificate on completed game
+- Timer auto-starts on a run; pauses on menu / save & quit
+- OBS streamer browser URL
+- Live sprite tracker on the map
+- LAN sync (phone + PC + OBS)
+- Modes: Standard / Open / Inverted · Keysanity variants · boss & entrance shuffle
 -
 
 ---
