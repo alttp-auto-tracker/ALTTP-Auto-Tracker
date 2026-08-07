@@ -1,5 +1,12 @@
 # ALTTP-AUTO-TRACKER
 
+
+DISCLAIMER: I am a working father that recently found out about ALTTP Randomizer. I mostly play from my bed and I had a hard time getting an auto tracker to work on my other devices.
+This is mostly made with AI to help me get this done faster. I originally wasn't going to publish this, but if it helps others, then I am happy with that. I will update this .md
+with screenshots and gifs to help users understand the way it works. 
+
+
+
 Web-based **A Link to the Past Randomizer** auto-tracker with live SNI support, OBS stream overlay, phone controller mode, and LAN sync.
 
 **Not affiliated with** [alttprtracker.com](https://alttprtracker.com/) or other community trackers.
@@ -61,7 +68,7 @@ After code updates: hard-refresh the browser (or bump `CACHE_VERSION` in `servic
 - Map guide line to the suggested check.
 - Hidden automatically in Race Legal mode.
 
-### Stream overlay (`streamer.html`)
+### Stream overlay (`streamer.html`) *** WORK IN PROGRESS *** 
 - Transparent OBS Browser Source with modular layout.
 - Presets: `classic`, `race`, `focus_items`, `maps_left`, `timer_only`, `items_only`, `maps_only`, …
 - Or assign modules (`timer`, `maps`, `items`, `stuck`/`spoiler`, `game`, …) to `top` / `left` / `center` / `right` / `bottom` via URL params.
@@ -102,11 +109,7 @@ alttpr-tracker/
 ├── js/                   Application logic
 ├── css/
 ├── assets/               Item icons, map art, markers
-└── docs/
-    ├── HANDOFF.txt       Full developer / session handoff
-    ├── LINUX-SETUP.txt   OBS + SNI + emulator on Linux
-    └── STREAM-LAYOUT.txt Overlay presets and URL params
-```
+
 
 ---
 
@@ -129,22 +132,6 @@ Those live in:
 2. **Local server sync files** (dotfiles next to `tracker-server.py`, created only when the server is running)
 
 Anyone who clones the repo gets a clean, default install. Your data never leaves your machine unless you deliberately export or share it.
-
----
-
-## Development notes
-
-When shipping a change:
-
-1. Bump the public version (README + `streamer.html` badge, e.g. `1.0.1` / `1.1.0`).
-2. Bump `CACHE_VERSION` in `service-worker.js` (`v2`, `v3`, …).
-3. Update `docs/HANDOFF.txt`.
-4. Tag a GitHub Release with short notes so users know what changed.
-5. Hard-refresh clients (or unregister the service worker in DevTools).
-
-Prefer small, testable changes. Keep the host/controller model intact. Spoiler route is the Practice coaching surface — do not revive the old “I’m Stuck” UI.
-
-More detail: [docs/HANDOFF.txt](docs/HANDOFF.txt)
 
 ---
 
