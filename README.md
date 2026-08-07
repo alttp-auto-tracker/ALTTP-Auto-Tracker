@@ -15,11 +15,19 @@ Connect one browser to SNI for live memory, use another (or your phone) as a con
 
 **Current version:** **1.0.0** · Service worker cache **v1**
 
-Tracker Main Screen:
+
+
+**Tracker Main Screen:**
 ![Main tracker](docs/screenshots/tracker-main.PNG)
 
-Tracker Mode Types Example
+**Tracker Mode Types Example**
+World: Standard / Open / Inverted
+Keys: Standard / Keysanity / Keys Only / Map Compass / Map Compass Small / Map Compass Big
+Bosses: Normal / Boss Shuffle 
+Entrances: Vanilla / Shuffle*
+*Shuffle has Entrance notes by clicking on a marker 
 ![Tracker Modes](docs/screenshots/tracker-modes.PNG)
+
 ---
 
 ## Quick start
