@@ -30,7 +30,7 @@ Entrances: Vanilla / Shuffle*<BR>
 
 
 List of Features:
--Permalink seed integration <BR>
+<small-Permalink seed link upload <BR>
 -Controller mode (phone / website) <BR>
 -Item Tracker (detailed view option) <BR>
 -Entrance notes for entrance shuffle <BR>
@@ -42,7 +42,7 @@ List of Features:
 -Certification upon completed game<BR>
 -Timer that auto starts on a run, pauses when on menu / save and quit<BR>
 -OBS Streamer browser URL<BR>
--Live Sprite tracker on map<BR>
+-Live Sprite tracker on map<BR></small>
 -
 
 ---
