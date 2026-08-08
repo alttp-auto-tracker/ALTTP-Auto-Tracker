@@ -3,7 +3,7 @@
 
 DISCLAIMER: I am a working father that recently found out about ALTTP Randomizer. I mostly play from my bed and I had a hard time getting an auto tracker to work on my other devices.
 This is mostly made with AI to help me get this done faster. I originally wasn't going to publish this, but if it helps others, then I am happy with that. I will update this .md
-with screenshots and gifs to help users understand the way it works. 
+with screenshots and gifs to help users understand the way it works. If you need to contact me about issues my name is : alttpauthtracker@gmail.com
 
 
 
